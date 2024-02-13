@@ -3,16 +3,7 @@
 #include "csapp.h"
 #include "utils.h"
 
-int is_internal (char *cmd) {
-  /*
-    Input:
-      cmd: string
-    
-    Output:
-      1 if the command is an internal command
-      0 if not
-  */
-  
+int is_internal (char *cmd) {  
   if (strcmp(cmd, "quit") == 0) {
     return 1;
   }
@@ -24,8 +15,7 @@ int is_internal (char *cmd) {
 }
 
 void exec_internal(struct cmdline *l){
-
-
+  
   if(strcmp(l->seq[0][0], "quit") == 0){
     exit(0);
   }
@@ -35,6 +25,7 @@ void exec_internal(struct cmdline *l){
       printf("Error: %s\n", strerror(errno));
     }
   }
+
 }
 
 void exec_external(struct cmdline *l){
