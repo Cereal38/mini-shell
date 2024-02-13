@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "readcmd.h"
 #include "csapp.h"
-
+#include "utils.h"
 
 int main()
 {
@@ -22,6 +22,9 @@ int main()
 
 		printf("%s:%s$ ", user, path);
 		l = readcmd();
+
+		char *commande = l->seq[0][0];
+
 		/* If input stream closed, normal termination */
 		if (!l) { // Ctrl+d
 			printf("exit\n");
@@ -34,28 +37,33 @@ int main()
 			continue;
 		}
 
-		if (strcmp(l->seq[0][0], "quit") == 0)
-		{
-			exit(0);
+		if(is_internal(commande)){
+			exec_internal(l);
 		}
-		if (strcmp(l->seq[0][0], "cd") == 0)
-		{
-			if (chdir(l->seq[0][1]) == -1)
-			{
-				perror("cd");
-			}	
+		else{
+			// exec_internal(l);
 		}
-		// All external commands are processed here
-		else {
-			// We create a child to run the external cmd
-			if (Fork() == 0) { // Child
-				execvp(l->seq[0][0],l->seq[0][1]);
-			}
 
-			else { // Parent
-				Wait(NULL);
-			}
-		}
+		// if (strcmp(commande, "quit") == 0)
+		// {
+		// 	quit();
+		// }
+		// if (strcmp(commande, "cd") == 0)
+		// {
+		// 	cd(l->seq[0][1]);
+		// 	continue;
+		// }
+		// // All external commands are processed here
+		// else {
+		// 	// We create a child to run the external cmd
+		// 	if (Fork() == 0) { // Child
+		// 		execvp(commande,l->seq[0][1]);
+		// 	}
+
+		// 	else { // Parent
+		// 		Wait(NULL);
+		// 	}
+		// }
 		
 		
 	}
