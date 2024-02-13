@@ -38,6 +38,15 @@ void exec_internal(struct cmdline *l){
 }
 
 void exec_external(struct cmdline *l){
+  char *commande = l->seq[0][0];
+  
+  if(Fork()==0){
+    execvp(commande,l->seq[0]);
+  }
+  else{
+    Wait(NULL);
+  }
 
-    return;
 }
+
+		

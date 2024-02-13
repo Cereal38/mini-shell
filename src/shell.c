@@ -41,32 +41,9 @@ int main()
 			exec_internal(l);
 		}
 		else{
-			// exec_internal(l);
+			exec_external(l);
 		}
 
-		// if (strcmp(commande, "quit") == 0)
-		// {
-		// 	quit();
-		// }
-		// if (strcmp(commande, "cd") == 0)
-		// {
-		// 	cd(l->seq[0][1]);
-		// 	continue;
-		// }
-		// // All external commands are processed here
-		// else {
-		// 	// We create a child to run the external cmd
-		// 	if (Fork() == 0) { // Child
-		// 		execvp(commande,l->seq[0][1]);
-		// 	}
-
-		// 	else { // Parent
-		// 		Wait(NULL);
-		// 	}
-		// }
-		
-		
 	}
-
 
 }
