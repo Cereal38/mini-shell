@@ -10,15 +10,20 @@
 
 int main()
 {
+	// Variable to set the prompt
+	char *path;
+	char *user = getenv("USER");
+	
 	while (1) {
+		
+		// Remember the path of thhe current directory
+		path = getcwd(NULL, 0);
 		struct cmdline *l;
-		int i, j;
 
-		printf("shell> ");
+		printf("%s:%s$ ", user, path);
 		l = readcmd();
-
 		/* If input stream closed, normal termination */
-		if (!l) {
+		if (!l) { // Ctrl+d
 			printf("exit\n");
 			exit(0);
 		}
@@ -32,6 +37,13 @@ int main()
 		if (strcmp(l->seq[0][0], "quit") == 0)
 		{
 			exit(0);
+		}
+		if (strcmp(l->seq[0][0], "cd") == 0)
+		{
+			if (chdir(l->seq[0][1]) == -1)
+			{
+				perror("cd");
+			}	
 		}
 		// All external commands are processed here
 		else {
