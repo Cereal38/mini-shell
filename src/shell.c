@@ -17,10 +17,6 @@ int main()
 		printf("shell> ");
 		l = readcmd();
 
-		if (strcmp(l->seq[0][0], "quit") == 0)
-		{
-			exit(0);
-		}
 		/* If input stream closed, normal termination */
 		if (!l) {
 			printf("exit\n");
@@ -33,7 +29,7 @@ int main()
 			continue;
 		}
 
-
+		
 		if (l->in) printf("in: %s\n", l->in);
 		if (l->out) printf("out: %s\n", l->out);
 
@@ -45,6 +41,10 @@ int main()
 				printf("%s ", cmd[j]);
 			}
 			printf("\n");
+		}
+		if (strcmp(l->seq[0][0], "quit") == 0)
+		{
+			exit(0);
 		}
 		
 	}
