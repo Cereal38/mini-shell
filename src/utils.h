@@ -2,6 +2,10 @@
 #define __UTILS_H
 
 #include "readcmd.h"
+
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
   
 /*
 Return true if the command is internal

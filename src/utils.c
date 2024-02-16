@@ -32,12 +32,22 @@ void exec_external(struct cmdline *l){
   char *commande = l->seq[0][0];
   
   if(Fork()==0){
+    // char *in;	/* If not null : name of file for input redirection. */
+	 // char *out;	/* If not null : name of file for output redirection. */
+    if (l->in) {
+      int fileIn = Open(l->in, O_RDONLY, 0);
+      dup2(fileIn, STDIN);
+    }
+    if (l->out) {
+      int fileOut = Open(l->out, O_CREAT | O_WRONLY, 0);
+      dup2( fileOut, STDOUT);
+    }
     execvp(commande,l->seq[0]);
-  }
-  else{
+  } else {
     Wait(NULL);
   }
 
 }
+
 
 		
