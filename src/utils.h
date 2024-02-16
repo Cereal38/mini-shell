@@ -35,4 +35,20 @@ void exec_internal (struct cmdline *l);
 */
 void exec_external (struct cmdline *l);
 
+/*
+    Redirect input and output to the given file
+
+    Input:
+      l: cmdline* (Current cmdline)
+
+*/
+void redirectInOut (struct cmdline *l);
+
+/*
+    Print an error message to stderr depending on the error code
+
+    Input:
+      commande: string (Command that caused the error)
+*/
+void gestion_erreur(char *commande);
 #endif
