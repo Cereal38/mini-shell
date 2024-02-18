@@ -36,13 +36,21 @@ void exec_internal(struct cmdline *l);
 void exec_external(struct cmdline *l);
 
 /*
-    Redirect input and output to the given file
+    Redirect input if needed
 
     Input:
       l: cmdline* (Current cmdline)
-
+      in: int* (File descriptor for input redirection)
 */
-void redirectInOut(struct cmdline *l);
+void handle_input_redirection(struct cmdline *l, int *in);
+
+/*
+    Redirect output if needed
+
+    Input:
+      l: cmdline* (Current cmdline)
+*/
+void handle_output_redirection(struct cmdline *l);
 
 /*
     Print an error message to stderr depending on the error code
