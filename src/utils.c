@@ -50,24 +50,6 @@ void handle_input_redirection(struct cmdline *l, int *in)
   }
 }
 
-void handle_output_redirection(struct cmdline *l)
-{
-  int fd_out;
-
-  if (l->out)
-  {
-    fd_out = open(l->out, O_WRONLY | O_CREAT, 0644);
-    if (fd_out == -1)
-    {
-      // TODO: Improve error handling
-      perror("open");
-      exit(EXIT_FAILURE);
-    }
-    dup2(fd_out, STDOUT_FILENO);
-    close(fd_out);
-  }
-}
-
 int is_internal(char *cmd)
 {
   if (strcmp(cmd, "quit") == 0)
@@ -104,6 +86,7 @@ void exec_external(struct cmdline *l)
   int p[2];
   int in = 0; // 'in' is the input file descriptor for the next command
   pid_t pid;
+  int fd_out; // File descriptor for output redirection
 
   // Redirect input if needed (wc < file.txt)
   handle_input_redirection(l, &in);
@@ -127,7 +110,17 @@ void exec_external(struct cmdline *l)
       }
 
       // Redirect output if needed (ls > file.txt)
-      handle_output_redirection(l);
+      else if (l->out)
+      { // If there is output redirection for the last command
+        fd_out = open(l->out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd_out == -1)
+        {
+          perror("open");
+          exit(EXIT_FAILURE);
+        }
+        dup2(fd_out, STDOUT_FILENO); // Redirect standard output to the file
+        close(fd_out);               // Close the file descriptor
+      }
 
       close(p[0]); // Close the unused read end of the pipe
 
