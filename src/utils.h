@@ -6,18 +6,18 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
-  
+
 /*
 Return true if the command is internal
 
 Input:
   cmd: string (Command to analyze)
-    
+
 Output:
   1 if the command is an internal command
   0 if not
 */
-int is_internal (char *cmd);
+int is_internal(char *cmd);
 
 /*
     Exec an internal command
@@ -25,7 +25,7 @@ int is_internal (char *cmd);
     Input:
       l: cmdline* (Current cmdline)
 */
-void exec_internal (struct cmdline *l);
+void exec_internal(struct cmdline *l);
 
 /*
     Exec an external command in a child process and wait for it to finish in the parent process
@@ -33,7 +33,7 @@ void exec_internal (struct cmdline *l);
     Input:
       l: cmdline* (Current cmdline)
 */
-void exec_external (struct cmdline *l);
+void exec_external(struct cmdline *l);
 
 /*
     Redirect input and output to the given file
@@ -42,7 +42,7 @@ void exec_external (struct cmdline *l);
       l: cmdline* (Current cmdline)
 
 */
-void redirectInOut (struct cmdline *l);
+void redirectInOut(struct cmdline *l);
 
 /*
     Print an error message to stderr depending on the error code
