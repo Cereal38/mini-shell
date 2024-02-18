@@ -19,7 +19,7 @@ int main()
   while (1)
   {
 
-    // Remember the path of thhe current directory
+    // Get the path of thhe current directory
     path = getcwd(NULL, 0);
     struct cmdline *l;
 
