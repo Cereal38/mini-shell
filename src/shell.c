@@ -10,40 +10,50 @@
 
 int main()
 {
-	// Variable to set the prompt
-	char *path;
-	char *user = getenv("USER");
-	
-	while (1) {
-		
-		// Remember the path of thhe current directory
-		path = getcwd(NULL, 0);
-		struct cmdline *l;
+  // Variables to set the prompt
+  char *path;
+  char *user = getenv("USER");
 
-		printf("%s:%s$ ", user, path);
-		l = readcmd();
+  char *commande;
 
-		char *commande = l->seq[0][0];
+  while (1)
+  {
 
-		/* If input stream closed, normal termination */
-		if (!l) { // Ctrl+d
-			printf("exit\n");
-			exit(0);
-		}
+    // Remember the path of thhe current directory
+    path = getcwd(NULL, 0);
+    struct cmdline *l;
 
-		if (l->err) {
-			/* Syntax error, read another command */
-			printf("error: %s\n", l->err);
-			continue;
-		}
+    // Display the prompt
+    printf("%s:%s$ ", user, path);
+    l = readcmd();
 
-		if(is_internal(commande)){
-			exec_internal(l);
-		}
-		else{
-			exec_external(l);
-		}
+    // Avoid segfault if the user leaves the prompt empty
+    if (l != NULL && l->seq[0] != NULL)
+    {
+      commande = l->seq[0][0];
 
-	}
+      /* If input stream closed, normal termination */
+      if (!l)
+      { // Ctrl+d
+        printf("exit\n");
+        exit(0);
+      }
 
+      if (l->err)
+      {
+        /* Syntax error, read another command */
+        printf("error: %s\n", l->err);
+        continue;
+      }
+
+      if (is_internal(commande))
+      {
+        exec_internal(l);
+      }
+      else
+      {
+        exec_external(l);
+      }
+    }
+  }
 }
