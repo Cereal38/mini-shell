@@ -68,6 +68,19 @@ void exec_external(struct cmdline *l)
 {
   int p[2], in = 0; // 'in' is the input file descriptor for the next command
   pid_t pid;
+  int fd_in, fd_out; // File descriptors for input and output redirection
+
+  // Handle input redirection
+  if (l->in)
+  {
+    fd_in = open(l->in, O_RDONLY);
+    if (fd_in == -1)
+    {
+      perror("open");
+      exit(EXIT_FAILURE);
+    }
+    in = fd_in; // Use the file as input for the first command
+  }
 
   // Iterate over each command in the pipeline
   for (int i = 0; l->seq[i] != NULL; i++)
@@ -85,6 +98,17 @@ void exec_external(struct cmdline *l)
       if (l->seq[i + 1] != NULL)
       {                            // If there is a next command
         dup2(p[1], STDOUT_FILENO); // Redirect standard output to 'p[1]'
+      }
+      else if (l->out)
+      { // If there is output redirection for the last command
+        fd_out = open(l->out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd_out == -1)
+        {
+          perror("open");
+          exit(EXIT_FAILURE);
+        }
+        dup2(fd_out, STDOUT_FILENO); // Redirect standard output to the file
+        close(fd_out);               // Close the file descriptor
       }
 
       close(p[0]); // Close the unused read end of the pipe
