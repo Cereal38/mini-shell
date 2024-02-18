@@ -3,33 +3,19 @@
 #include "csapp.h"
 #include "utils.h"
 
-void gestion_erreur(char *commande)
+void error_handling(char *command)
 {
   if (errno == ENOENT)
   {
-    fprintf(stderr, "%s: Command not found\n", commande);
+    fprintf(stderr, "%s: Command not found\n", command);
   }
   else if (errno == EACCES)
   {
-    fprintf(stderr, "%s: Permission denied\n", commande);
+    fprintf(stderr, "%s: Permission denied\n", command);
   }
   else
   {
-    fprintf(stderr, "%s: Error %s\n", commande, strerror(errno));
-  }
-}
-
-void redirectInOut(struct cmdline *l)
-{
-  if (l->in)
-  {
-    int fd = Open(l->in, O_RDONLY, 0);
-    Dup2(fd, STDIN);
-  }
-  if (l->out)
-  {
-    int fd = Open(l->out, O_WRONLY | O_CREAT, 0);
-    Dup2(fd, STDOUT);
+    fprintf(stderr, "%s: Error %s\n", command, strerror(errno));
   }
 }
 
@@ -125,7 +111,7 @@ void exec_external(struct cmdline *l)
       close(p[0]); // Close the unused read end of the pipe
 
       execvp(l->seq[i][0], l->seq[i]);
-      gestion_erreur(l->seq[i][0]);
+      error_handling(l->seq[i][0]);
       exit(EXIT_FAILURE);
     }
     else

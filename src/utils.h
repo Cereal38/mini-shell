@@ -48,7 +48,7 @@ void redirectInOut(struct cmdline *l);
     Print an error message to stderr depending on the error code
 
     Input:
-      commande: string (Command that caused the error)
+      command: string (Command that caused the error)
 */
-void gestion_erreur(char *commande);
+void error_handling(char *command);
 #endif
