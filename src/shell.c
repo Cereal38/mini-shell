@@ -24,7 +24,7 @@ int main()
     struct cmdline *l;
 
     // Display the prompt
-    printf("%s:%s$ ", user, path);
+    printf("%s%s%s:%s%s%s$ ", GREEN, user, RESET, BLUE, path, RESET);
     l = readcmd();
 
     // Avoid segfault if the user leaves the prompt empty
