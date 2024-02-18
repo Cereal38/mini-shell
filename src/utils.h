@@ -42,21 +42,29 @@ void exec_external(struct cmdline *l);
       l: cmdline* (Current cmdline)
       in: int* (File descriptor for input redirection)
 */
-void handle_input_redirection(struct cmdline *l, int *in);
+int handle_input_redirection(struct cmdline *l, int *in);
 
 /*
     Redirect output if needed
 
     Input:
       l: cmdline* (Current cmdline)
+
+    Output:
+      1 if the redirection was successful
+      0 if not
 */
-void handle_output_redirection(struct cmdline *l);
+int handle_output_redirection(struct cmdline *l);
 
 /*
     Print an error message to stderr depending on the error code
 
     Input:
       command: string (Command that caused the error)
+
+    Output:
+      1 if the redirection was successful
+      0 if not
 */
 void error_handling(char *command);
 #endif

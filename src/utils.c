@@ -19,24 +19,23 @@ void error_handling(char *command)
   }
 }
 
-void handle_input_redirection(struct cmdline *l, int *in)
+int handle_input_redirection(struct cmdline *l, int *in)
 {
   int fd_in;
-
   if (l->in)
   {
     fd_in = open(l->in, O_RDONLY);
     if (fd_in == -1)
     {
-      // TODO: Improve error handling
       perror("open");
-      exit(EXIT_FAILURE);
+      return 0;
     }
-    *in = fd_in;
+    *in = fd_in; // Redirect standard input to the file
   }
+  return 1;
 }
 
-void handle_output_redirection(struct cmdline *l)
+int handle_output_redirection(struct cmdline *l)
 {
   int fd_out;
   if (l->out)
@@ -45,11 +44,12 @@ void handle_output_redirection(struct cmdline *l)
     if (fd_out == -1)
     {
       perror("open");
-      exit(EXIT_FAILURE);
+      return 0;
     }
     dup2(fd_out, STDOUT_FILENO); // Redirect standard output to the file
     close(fd_out);               // Close the file descriptor
   }
+  return 1;
 }
 
 int is_internal(char *cmd)
@@ -88,10 +88,12 @@ void exec_external(struct cmdline *l)
   int p[2];
   int in = 0; // 'in' is the input file descriptor for the next command
   pid_t pid;
-  int fd_out; // File descriptor for output redirection
 
   // Redirect input if needed (wc < file.txt)
-  handle_input_redirection(l, &in);
+  if (!handle_input_redirection(l, &in))
+  {
+    return;
+  }
 
   // Iterate over each command in the pipeline
   for (int i = 0; l->seq[i] != NULL; i++)
@@ -114,7 +116,10 @@ void exec_external(struct cmdline *l)
       // Redirect output if needed (ls > file.txt)
       else
       {
-        handle_output_redirection(l);
+        if (!handle_output_redirection(l))
+        {
+          return;
+        }
       }
 
       close(p[0]); // Close the unused read end of the pipe
