@@ -3,6 +3,45 @@
 #include "csapp.h"
 #include "utils.h"
 
+pid_t proc_foreground[MAX_SIZE_PROC_ARRAY] = {-1};
+pid_t proc_background[MAX_SIZE_PROC_ARRAY] = {-1};
+
+void add_processus(pid_t pid , int type) {
+  if(type==FG){
+    int i = 0;
+    while (proc_foreground[i] != -1) {
+      i++;
+    }
+    proc_foreground[i] = pid;
+    proc_foreground[i + 1] = -1;
+  }
+  else{
+    int i = 0;
+    while (proc_background[i] != -1) {
+      i++;
+    }
+    proc_background[i] = pid;
+    proc_background[i + 1] = -1;
+  }
+}
+
+void remove_processus(pid_t pid , int type) {
+  if(type==FG){
+    int i = 0;
+    while (proc_foreground[i] != pid) {
+      i++;
+    }
+    proc_foreground[i] = -1;
+  }
+  else{
+    int i = 0;
+    while (proc_background[i] != pid) {
+      i++;
+    }
+    proc_background[i] = -1;
+  }
+}
+
 void error_handling(char *command)
 {
   if (errno == ENOENT)
@@ -68,6 +107,7 @@ int is_internal(char *cmd)
 
 void exec_internal(struct cmdline *l)
 {
+
   if(l->is_background){
 			printf("%d\n",l->is_background);
 		}	
@@ -134,6 +174,7 @@ void exec_external(struct cmdline *l)
     }
     else
     {             // Parent process
+      add_processus(pid,l->is_background);
       wait(NULL); // Wait for the child process to finish
 
       if (in != 0)
@@ -145,7 +186,9 @@ void exec_external(struct cmdline *l)
       in = p[0];   // Save the read end of the pipe as 'in' for the next command
     }
   }
-  for(int i = 0; l->seq[i] != 0; i++){
+  int i = 0;
+  while(proc_foreground[i] != -1){
     wait(NULL);
+    remove_processus(pid,FG);
   }
 }

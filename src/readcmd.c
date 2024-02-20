@@ -189,6 +189,7 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
+	s->is_background = 0;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {

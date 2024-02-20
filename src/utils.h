@@ -13,6 +13,25 @@
 #define GREEN "\033[0;32m"
 #define RESET "\033[0m"
 
+#define MAX_SIZE_PROC_ARRAY 1000
+
+#define BG 1
+#define FG 0
+
+/*
+Add a process to the foreground or to the background array of process
+
+Input:
+  pid: PID to ad to the array
+  type: 0 to add to the background array
+        1 t
+
+Output:
+  1 if the command is an internal command
+  0 if not
+*/
+void add_processus(pid_t pid , int type);
+
 /*
 Return true if the command is internal
 
