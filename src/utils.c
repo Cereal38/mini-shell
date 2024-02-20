@@ -7,6 +7,7 @@
 pid_t proc_foreground[MAX_SIZE_PROC_ARRAY] = {-1};
 pid_t proc_background[MAX_SIZE_PROC_ARRAY] = {-1};
 
+
 void add_processus(pid_t pid , int type) {
   int i = 0;
   if(type==FG){
@@ -46,6 +47,13 @@ void remove_processus(pid_t pid , int type) {
       i++;
     }
     proc_background[i] = -1;
+  }
+}
+void handler_child(int sig){
+  pid_t pid;
+  while((pid = waitpid(-1,NULL,WNOHANG|WUNTRACED)) > 0){
+    // printf("Process %d finished\n",pid);
+      remove_processus(pid,is_background(pid));
   }
 }
 
@@ -145,12 +153,6 @@ void exec_internal(struct cmdline *l)
   }
 }
 
-void handler_child(int sig){
-  pid_t pid;
-  while((pid = waitpid(-1,NULL,WNOHANG|WUNTRACED)) > 0){
-      remove_processus(pid,is_background(pid));
-  }
-}
 
 void exec_external(struct cmdline *l)
 {
