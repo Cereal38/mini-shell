@@ -68,10 +68,10 @@ int is_internal(char *cmd)
 
 void exec_internal(struct cmdline *l)
 {
-  if(l->background){
-			printf("Background process\n");
+  if(l->is_background){
+			printf("%d\n",l->is_background);
 		}	
-  if (strcmp(l->seq[0][0], "quit") == 0)
+  if (strcmp(l->seq[0][0], "quit") == 0 || strcmp(l->seq[0][0], "exit") == 0)
   {
     exit(0);
   }
@@ -87,10 +87,9 @@ void exec_internal(struct cmdline *l)
 
 void exec_external(struct cmdline *l)
 {
-  int p[2];
   int in = 0; // 'in' is the input file descriptor for the next command
   pid_t pid;
-  if(l->background){
+  if(l->is_background){
 			printf("Background process\n");
 		}	
   // Redirect input if needed (wc < file.txt)
@@ -102,6 +101,7 @@ void exec_external(struct cmdline *l)
   // Iterate over each command in the pipeline
   for (int i = 0; l->seq[i] != NULL; i++)
   {
+    int p[2];
     pipe(p); // Create a new pipe
 
     if ((pid = fork()) == 0)
@@ -144,5 +144,8 @@ void exec_external(struct cmdline *l)
       close(p[1]); // Close the unused write end of the pipe
       in = p[0];   // Save the read end of the pipe as 'in' for the next command
     }
+  }
+  for(int i = 0; l->seq[i] != 0; i++){
+    wait(NULL);
   }
 }

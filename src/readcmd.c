@@ -194,7 +194,7 @@ struct cmdline *readcmd(void)
 	while ((w = words[i++]) != 0) {
 		switch (w[0]) {
 		case '&':
-			if (s->background) {
+			if (s->is_background) {
 				s->err = "misplaced &";
 				goto error;
 			}
@@ -202,7 +202,7 @@ struct cmdline *readcmd(void)
 				s->err = "misplaced &";
 				goto error;
 			}
-			s->background = w;
+			s->is_background = 1;
 			break;
 
 		case '<':
