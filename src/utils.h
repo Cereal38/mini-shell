@@ -18,17 +18,17 @@
 #define BG 1
 #define FG 0
 
+void handler_child(int sid);
+
+int is_background (pid_t pid);
+
 /*
 Add a process to the foreground or to the background array of process
 
 Input:
   pid: PID to ad to the array
   type: 0 to add to the background array
-        1 t
-
-Output:
-  1 if the command is an internal command
-  0 if not
+        1 to add to the background array
 */
 void add_processus(pid_t pid , int type);
 
