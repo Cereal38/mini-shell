@@ -8,8 +8,11 @@
 #include "csapp.h"
 #include "utils.h"
 
+
 int main()
 {
+
+  Signal(SIGINT,handler_interrupt_shell);
   // Variables to set the prompt
   char *path;
   char *user = getenv("USER");

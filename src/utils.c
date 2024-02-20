@@ -57,6 +57,13 @@ void handler_child(int sig){
   }
 }
 
+void handler_interrupt_shell(int sig) {
+  printf("\n");
+  return;
+}
+
+
+
 int is_background (pid_t pid) {
   int i = 0;
   while (proc_background[i] != -1) {
@@ -178,6 +185,8 @@ void exec_external(struct cmdline *l)
 
     if ((pid = fork()) == 0)
     { // Child process
+      //default sigint handler
+      Signal(SIGINT,SIG_DFL);
       if (in != 0)
       {                         // If 'in' is not standard input
         dup2(in, STDIN_FILENO); // Redirect 'in' to standard input

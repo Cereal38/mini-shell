@@ -18,7 +18,11 @@
 #define BG 1
 #define FG 0
 
-void handler_child(int sid);
+void handler_child(int sig);
+
+void handler_interrupt_shell(int sig);
+
+void handler_interrupt_child(int sig);
 
 int is_background (pid_t pid);
 
