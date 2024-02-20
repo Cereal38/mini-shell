@@ -68,7 +68,9 @@ int is_internal(char *cmd)
 
 void exec_internal(struct cmdline *l)
 {
-
+  if(l->background){
+			printf("Background process\n");
+		}	
   if (strcmp(l->seq[0][0], "quit") == 0)
   {
     exit(0);
@@ -88,7 +90,9 @@ void exec_external(struct cmdline *l)
   int p[2];
   int in = 0; // 'in' is the input file descriptor for the next command
   pid_t pid;
-
+  if(l->background){
+			printf("Background process\n");
+		}	
   // Redirect input if needed (wc < file.txt)
   if (!handle_input_redirection(l, &in))
   {
