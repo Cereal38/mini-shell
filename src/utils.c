@@ -97,6 +97,10 @@ int is_internal(char *cmd)
   {
     return 1;
   }
+  else if (strcmp(cmd, "exit") == 0)
+  {
+    return 1;
+  }
   else if (strcmp(cmd, "cd") == 0)
   {
     return 1;
@@ -109,8 +113,9 @@ void exec_internal(struct cmdline *l)
 {
 
   if(l->is_background){
-			printf("%d\n",l->is_background);
-		}	
+    printf("%d\n",l->is_background);
+  }
+  
   if (strcmp(l->seq[0][0], "quit") == 0 || strcmp(l->seq[0][0], "exit") == 0)
   {
     exit(0);
