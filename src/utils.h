@@ -82,6 +82,7 @@ int handle_input_redirection(struct cmdline *l, int *in);
 
     Input:
       l: cmdline* (Current cmdline)
+      in: int* (File descriptor for output redirection)
 
     Output:
       1 if the redirection was successful

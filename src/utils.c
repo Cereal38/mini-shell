@@ -93,7 +93,7 @@ int handle_input_redirection(struct cmdline *l, int *in)
   int fd_in;
   if (l->in)
   {
-    fd_in = open(l->in, O_RDONLY);
+    fd_in = Open(l->in, O_RDONLY,0);
     if (fd_in == -1)
     {
       perror("open");
@@ -109,13 +109,13 @@ int handle_output_redirection(struct cmdline *l)
   int fd_out;
   if (l->out)
   {
-    fd_out = open(l->out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    fd_out = open(l->out, O_WRONLY | O_CREAT, 0);
     if (fd_out == -1)
     {
       perror("open");
       return 0;
     }
-    dup2(fd_out, STDOUT_FILENO); // Redirect standard output to the file
+    Dup2(fd_out, STDOUT); // Redirect standard output to the file
     close(fd_out);               // Close the file descriptor
   }
   return 1;
@@ -141,11 +141,6 @@ int is_internal(char *cmd)
 
 void exec_internal(struct cmdline *l)
 {
-
-  if(l->is_background){
-    printf("%d\n",l->is_background);
-  }
-  
   if (strcmp(l->seq[0][0], "quit") == 0 || strcmp(l->seq[0][0], "exit") == 0)
   {
     exit(0);
@@ -163,10 +158,10 @@ void exec_internal(struct cmdline *l)
 
 void exec_external(struct cmdline *l)
 {
-  int in = 0; // 'in' is the input file descriptor for the next command
+  int in = 0; // 'in' is the input file descriptor for the next command in the pipe (0 for the first command)
   pid_t pid;
 
-  Signal(SIGCHLD,handler_child);
+  Signal(SIGCHLD,handler_child); // Register the signal handler for SIGCHLD
   
   if(l->is_background){
 			printf("Background process\n");
@@ -185,17 +180,16 @@ void exec_external(struct cmdline *l)
 
     if ((pid = fork()) == 0)
     { // Child process
-      //default sigint handler
-      Signal(SIGINT,SIG_DFL);
-      if (in != 0)
-      {                         // If 'in' is not standard input
-        dup2(in, STDIN_FILENO); // Redirect 'in' to standard input
+      Signal(SIGINT,SIG_DFL); //default sigint handler
+      if (in != 0) // If 'in' is not standard input
+      {                         
+        Dup2(in, STDIN); // Redirect 'in' to standard input
         close(in);              // Close the used file descriptor
       }
 
       if (l->seq[i + 1] != NULL)
       {                            // If there is a next command
-        dup2(p[1], STDOUT_FILENO); // Redirect standard output to 'p[1]'
+        Dup2(p[1], STDOUT); // Redirect standard output to 'p[1]'
       }
 
       // Redirect output if needed (ls > file.txt)

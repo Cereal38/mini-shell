@@ -12,7 +12,7 @@
 int main()
 {
 
-  Signal(SIGINT,handler_interrupt_shell);
+  Signal(SIGINT,handler_interrupt_shell); // Ingore the signal Ctrl+c
   // Variables to set the prompt
   char *path;
   char *user = getenv("USER");
