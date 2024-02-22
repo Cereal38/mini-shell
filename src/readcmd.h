@@ -9,15 +9,15 @@
 Display an error and call exit() in case of memory exhaustion. */
 struct cmdline *readcmd(void);
 
-
 /* Structure returned by readcmd() */
-struct cmdline {
-	char *err;	/* If not null, it is an error message that should be
-			   displayed. The other fields are null. */
-	char *in;	/* If not null : name of file for input redirection. */
-	char *out;	/* If not null : name of file for output redirection. */
-	char ***seq;	/* See comment below */
-	int is_background ; /* If 1 : command is to be run in background */
+struct cmdline
+{
+  char *err;         /* If not null, it is an error message that should be
+                displayed. The other fields are null. */
+  char *in;          /* If not null : name of file for input redirection. */
+  char *out;         /* If not null : name of file for output redirection. */
+  char ***seq;       /* See comment below */
+  int is_background; /* If 1 : command is to be run in background */
 };
 
 /* Field seq of struct cmdline :

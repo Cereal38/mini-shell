@@ -18,23 +18,45 @@
 #define BG 1
 #define FG 0
 
-void handler_child(int sig);
-
-void handler_interrupt_shell(int sig);
-
-void handler_interrupt_child(int sig);
-
-int is_background (pid_t pid);
-
 /*
-Add a process to the foreground or to the background array of process
+Add a process to the foreground / background array of process
 
 Input:
   pid: PID to ad to the array
   type: 0 to add to the background array
         1 to add to the background array
 */
-void add_processus(pid_t pid , int type);
+void add_processus(pid_t pid, int type);
+
+/*
+Remove a process from the foreground / background array of process
+
+Input:
+  pid: PID to remove from the array
+  type: 0 to remove from the background array
+        1 to remove from the background array
+*/
+void remove_processus(pid_t pid, int type);
+
+/*
+Handler for the SIGCHLD signal
+It waits for the child process and removes it from the foreground / background array
+
+Input:
+  sig: int
+*/
+void handler_child(int sig);
+
+/*
+Handler for the SIGINT signal
+It "deactivates" the SIGINT (Ctrl+C) signal. It is used to prevent the shell from being interrupted
+
+Input:
+  sig: int
+*/
+void handler_interrupt_shell(int sig);
+
+int is_background(pid_t pid);
 
 /*
 Return true if the command is internal

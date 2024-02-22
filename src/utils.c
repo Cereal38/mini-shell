@@ -7,18 +7,22 @@
 pid_t proc_foreground[MAX_SIZE_PROC_ARRAY] = {-1};
 pid_t proc_background[MAX_SIZE_PROC_ARRAY] = {-1};
 
-
-void add_processus(pid_t pid , int type) {
+void add_processus(pid_t pid, int type)
+{
   int i = 0;
-  if(type==FG){
-    while (proc_foreground[i] != -1) {
+  if (type == FG)
+  {
+    while (proc_foreground[i] != -1)
+    {
       i++;
     }
     proc_foreground[i] = pid;
     proc_foreground[i + 1] = -1;
   }
-  else{
-    while (proc_background[i] != -1) {
+  else
+  {
+    while (proc_background[i] != -1)
+    {
       i++;
     }
     proc_background[i] = pid;
@@ -26,48 +30,62 @@ void add_processus(pid_t pid , int type) {
   }
 }
 
-void remove_processus(pid_t pid , int type) {
+void remove_processus(pid_t pid, int type)
+{
   int i = 0;
-  if(type==FG){
-    while (proc_foreground[i] != pid) {
+  if (type == FG)
+  {
+    while (proc_foreground[i] != pid)
+    {
       i++;
     }
-    while (proc_foreground[i + 1] != -1) {
+    while (proc_foreground[i + 1] != -1)
+    {
       proc_foreground[i] = proc_foreground[i + 1];
       i++;
     }
     proc_foreground[i] = -1;
   }
-  else{
-    while (proc_background[i] != pid) {
+  else
+  {
+    while (proc_background[i] != pid)
+    {
       i++;
     }
-    while (proc_background[i + 1] != -1) {
+    while (proc_background[i + 1] != -1)
+    {
       proc_background[i] = proc_background[i + 1];
       i++;
     }
     proc_background[i] = -1;
   }
 }
-void handler_child(int sig){
+
+void handler_child(int sig)
+{
   pid_t pid;
-  while((pid = waitpid(-1,NULL,WNOHANG|WUNTRACED)) > 0){
+  while ((pid = waitpid(-1, NULL, WNOHANG | WUNTRACED)) > 0)
+  {
     // printf("Process %d finished\n",pid);
-      remove_processus(pid,is_background(pid));
+    remove_processus(pid, is_background(pid));
   }
 }
 
-void handler_interrupt_shell(int sig) {
+void handler_interrupt_shell(int sig)
+{
   printf("\n");
   return;
 }
 
-
-
-int is_background (pid_t pid) {
+int is_background(pid_t pid)
+{
   int i = 0;
-  while (proc_background[i] != -1) {
-    if (proc_background[i] == pid) { return 1; }
+  while (proc_background[i] != -1)
+  {
+    if (proc_background[i] == pid)
+    {
+      return 1;
+    }
   }
   return 0;
 }
@@ -93,7 +111,7 @@ int handle_input_redirection(struct cmdline *l, int *in)
   int fd_in;
   if (l->in)
   {
-    fd_in = Open(l->in, O_RDONLY,0);
+    fd_in = Open(l->in, O_RDONLY, 0);
     if (fd_in == -1)
     {
       perror("open");
@@ -116,7 +134,7 @@ int handle_output_redirection(struct cmdline *l)
       return 0;
     }
     Dup2(fd_out, STDOUT); // Redirect standard output to the file
-    close(fd_out);               // Close the file descriptor
+    close(fd_out);        // Close the file descriptor
   }
   return 1;
 }
@@ -155,17 +173,17 @@ void exec_internal(struct cmdline *l)
   }
 }
 
-
 void exec_external(struct cmdline *l)
 {
   int in = 0; // 'in' is the input file descriptor for the next command in the pipe (0 for the first command)
   pid_t pid;
 
-  Signal(SIGCHLD,handler_child); // Register the signal handler for SIGCHLD
-  
-  if(l->is_background){
-			printf("Background process\n");
-		}	
+  Signal(SIGCHLD, handler_child); // Register the signal handler for SIGCHLD
+
+  if (l->is_background)
+  {
+    printf("Background process\n");
+  }
   // Redirect input if needed (wc < file.txt)
   if (!handle_input_redirection(l, &in))
   {
@@ -179,16 +197,16 @@ void exec_external(struct cmdline *l)
     pipe(p); // Create a new pipe
 
     if ((pid = fork()) == 0)
-    { // Child process
-      Signal(SIGINT,SIG_DFL); //default sigint handler
-      if (in != 0) // If 'in' is not standard input
-      {                         
+    {                          // Child process
+      Signal(SIGINT, SIG_DFL); // default sigint handler
+      if (in != 0)             // If 'in' is not standard input
+      {
         Dup2(in, STDIN); // Redirect 'in' to standard input
-        close(in);              // Close the used file descriptor
+        close(in);       // Close the used file descriptor
       }
 
       if (l->seq[i + 1] != NULL)
-      {                            // If there is a next command
+      {                     // If there is a next command
         Dup2(p[1], STDOUT); // Redirect standard output to 'p[1]'
       }
 
@@ -208,8 +226,8 @@ void exec_external(struct cmdline *l)
       exit(EXIT_FAILURE);
     }
     else
-    {             // Parent process
-      add_processus(pid,l->is_background);
+    { // Parent process
+      add_processus(pid, l->is_background);
       if (in != 0)
       {            // If 'in' is not standard input
         close(in); // Close the used file descriptor
@@ -219,10 +237,10 @@ void exec_external(struct cmdline *l)
       in = p[0];   // Save the read end of the pipe as 'in' for the next command
     }
   }
-    while(proc_foreground[0] != -1){
-      sleep(1);
-      // if(proc_foreground[0] != -1)
-      // printf("Waiting for process to finish %d\n",proc_foreground[0]);
-    }    
+  while (proc_foreground[0] != -1)
+  {
+    sleep(1);
+    // if(proc_foreground[0] != -1)
+    // printf("Waiting for process to finish %d\n",proc_foreground[0]);
+  }
 }
-
