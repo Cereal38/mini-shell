@@ -5,3 +5,4 @@ rm temp.txt
 ls > temp.txt
 cat temp.txt
 rm temp.txt
+CLOSE

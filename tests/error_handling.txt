@@ -5,3 +5,4 @@
 commande_inexistante
 cat fichier_inexistant
 cat /etc/shadow
+CLOSE

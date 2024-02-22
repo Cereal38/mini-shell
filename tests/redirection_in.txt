@@ -2,3 +2,4 @@
 # redirection_in.txt - Tester la redirection de l'entrée standard en affichant le contenu du fichier README.md
 #
 cat < README.md
+CLOSE

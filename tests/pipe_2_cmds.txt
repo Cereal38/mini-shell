@@ -2,3 +2,4 @@
 # pipe_2_cmds.txt - Tester l'opérateur "|" avec deux commandes
 #
 ls | wc -l
+CLOSE

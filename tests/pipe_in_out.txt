@@ -5,3 +5,4 @@ rm temp.txt
 cat < Makefile | grep CC > temp.txt
 cat temp.txt
 rm temp.txt
+CLOSE
