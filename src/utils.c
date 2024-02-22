@@ -4,6 +4,7 @@
 #include "csapp.h"
 #include "utils.h"
 
+// Contain the PID of childs process (foreground and background)
 pid_t proc_foreground[MAX_SIZE_PROC_ARRAY] = {-1};
 pid_t proc_background[MAX_SIZE_PROC_ARRAY] = {-1};
 
@@ -12,10 +13,12 @@ void add_processus(pid_t pid, int type)
   int i = 0;
   if (type == FG)
   {
+    // Find the position of the last element
     while (proc_foreground[i] != -1)
     {
       i++;
     }
+    // Add the new process to the array
     proc_foreground[i] = pid;
     proc_foreground[i + 1] = -1;
   }
@@ -35,10 +38,12 @@ void remove_processus(pid_t pid, int type)
   int i = 0;
   if (type == FG)
   {
+    // Find the position of the process
     while (proc_foreground[i] != pid)
     {
       i++;
     }
+    // Remove the process from the array and shift the other elements to the left
     while (proc_foreground[i + 1] != -1)
     {
       proc_foreground[i] = proc_foreground[i + 1];
@@ -64,9 +69,9 @@ void remove_processus(pid_t pid, int type)
 void handler_child(int sig)
 {
   pid_t pid;
+  // Wait for the child process to finish
   while ((pid = waitpid(-1, NULL, WNOHANG | WUNTRACED)) > 0)
   {
-    // printf("Process %d finished\n",pid);
     remove_processus(pid, is_background(pid));
   }
 }
@@ -111,6 +116,7 @@ int handle_input_redirection(struct cmdline *l, int *in)
   int fd_in;
   if (l->in)
   {
+    // Open the file for reading
     fd_in = Open(l->in, O_RDONLY, 0);
     if (fd_in == -1)
     {
@@ -127,6 +133,7 @@ int handle_output_redirection(struct cmdline *l)
   int fd_out;
   if (l->out)
   {
+    // Open the file for writing
     fd_out = open(l->out, O_WRONLY | O_CREAT, 0);
     if (fd_out == -1)
     {
@@ -178,7 +185,7 @@ void exec_external(struct cmdline *l)
   int in = 0; // 'in' is the input file descriptor for the next command in the pipe (0 for the first command)
   pid_t pid;
 
-  Signal(SIGCHLD, handler_child); // Register the signal handler for SIGCHLD
+  Signal(SIGCHLD, handler_child); // Add the signal handler for SIGCHLD
 
   if (l->is_background)
   {
