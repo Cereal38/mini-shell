@@ -134,7 +134,7 @@ int handle_output_redirection(struct cmdline *l)
   if (l->out)
   {
     // Open the file for writing
-    fd_out = open(l->out, O_WRONLY | O_CREAT, 0);
+    fd_out = open(l->out, O_WRONLY | O_CREAT, 0644);
     if (fd_out == -1)
     {
       perror("open");

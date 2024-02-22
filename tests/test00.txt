@@ -1,1 +1,0 @@
-cat < temp.txt | grep e | grep temp > a.txt

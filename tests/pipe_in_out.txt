@@ -1,0 +1,7 @@
+#
+# pipe_in_out.txt - Tester les opérateurs "<", ">" et "|" en une ligne de commande
+#
+rm temp.txt
+cat < Makefile | grep CC > temp.txt
+cat temp.txt
+rm temp.txt

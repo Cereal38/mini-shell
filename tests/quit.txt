@@ -1,0 +1,5 @@
+#
+# quit.txt - Tester la commande quit
+#
+quit
+WAIT

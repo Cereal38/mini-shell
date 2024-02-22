@@ -1,0 +1,4 @@
+#
+# pipe_4_cmds.txt - Tester l'opérateur "|" avec plus de 2 commandes
+#
+ls | cat | grep e | wc -l
