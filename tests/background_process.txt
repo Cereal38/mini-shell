@@ -1,0 +1,5 @@
+#
+# background_process.txt - Tester la gestion des processus lancés en arrière-plan
+#
+sleep 1 &
+ps | grep sleep
