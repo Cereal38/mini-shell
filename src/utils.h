@@ -56,35 +56,25 @@ Input:
 */
 void handler_interrupt_shell(int sig);
 
+/*
+Return 1 if the process is in the background array
+
+Input:
+  pid: PID to check
+
+Output:
+  1 if the process is in the background array
+  0 if not
+*/
 int is_background(pid_t pid);
 
 /*
-Return true if the command is internal
-
-Input:
-  cmd: string (Command to analyze)
-
-Output:
-  1 if the command is an internal command
-  0 if not
-*/
-int is_internal(char *cmd);
-
-/*
-    Exec an internal command
+    Print an error message to stderr depending on the error code
 
     Input:
-      l: cmdline* (Current cmdline)
+      command: string (Command that caused the error)
 */
-void exec_internal(struct cmdline *l);
-
-/*
-    Exec an external command in a child process and wait for it to finish in the parent process
-
-    Input:
-      l: cmdline* (Current cmdline)
-*/
-void exec_external(struct cmdline *l);
+void error_handling(char *command);
 
 /*
     Redirect input if needed
@@ -113,10 +103,30 @@ int handle_input_redirection(struct cmdline *l, int *in);
 int handle_output_redirection(struct cmdline *l);
 
 /*
-    Print an error message to stderr depending on the error code
+Return 1 if the command is an internal one
+
+Input:
+  cmd: string (Command to analyze)
+
+Output:
+  1 if the command is an internal command
+  0 if not
+*/
+int is_internal(char *cmd);
+
+/*
+    Exec internal commands
 
     Input:
-      command: string (Command that caused the error)
+      l: cmdline* (Current cmdline)
 */
-void error_handling(char *command);
+void exec_internal(struct cmdline *l);
+
+/*
+    Exec external commands
+
+    Input:
+      l: cmdline* (Current cmdline)
+*/
+void exec_external(struct cmdline *l);
 #endif
