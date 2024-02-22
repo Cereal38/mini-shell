@@ -8,11 +8,10 @@
 #include "csapp.h"
 #include "utils.h"
 
-
 int main()
 {
 
-  Signal(SIGINT,handler_interrupt_shell); // Ingore the signal Ctrl+c
+  Signal(SIGINT, handler_interrupt_shell); // Ignore the signal Ctrl+c
   // Variables to set the prompt
   char *path;
   char *user = getenv("USER");
@@ -30,17 +29,17 @@ int main()
     printf("%s%s%s:%s%s%s$ ", GREEN, user, RESET, BLUE, path, RESET);
     l = readcmd();
 
+    // Ctrl+d
+    if (!l)
+    {
+      printf("\n");
+      exit(0);
+    }
+
     // Avoid segfault if the user leaves the prompt empty
     if (l != NULL && l->seq[0] != NULL)
     {
       commande = l->seq[0][0];
-
-      /* If input stream closed, normal termination */
-      if (!l)
-      { // Ctrl+d
-        printf("exit\n");
-        exit(0);
-      }
 
       if (l->err)
       {
