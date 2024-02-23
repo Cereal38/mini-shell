@@ -189,10 +189,23 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
+	s->is_background = 0;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {
 		switch (w[0]) {
+		case '&':
+			if (s->is_background) {
+				s->err = "misplaced &";
+				goto error;
+			}
+			if (words[i] != 0) {
+				s->err = "misplaced &";
+				goto error;
+			}
+			s->is_background = 1;
+			break;
+
 		case '<':
 			/* Tricky : the word can only be "<" */
 			if (s->in) {
@@ -258,6 +271,7 @@ error:
 		case '<':
 		case '>':
 		case '|':
+		case '&':
 			break;
 		default:
 			free(w);

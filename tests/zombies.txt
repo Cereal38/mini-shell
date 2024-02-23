@@ -1,0 +1,9 @@
+#
+# zombies.txt - Tester la gestion des zombies
+#
+ls
+echo
+ls
+echo
+ps
+CLOSE

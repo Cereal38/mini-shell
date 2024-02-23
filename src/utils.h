@@ -13,33 +13,68 @@
 #define GREEN "\033[0;32m"
 #define RESET "\033[0m"
 
+#define MAX_SIZE_PROC_ARRAY 1000
+
+#define BG 1
+#define FG 0
+
 /*
-Return true if the command is internal
+Add a process to the foreground / background array of process
 
 Input:
-  cmd: string (Command to analyze)
+  pid: PID to ad to the array
+  type: 0 to add to the background array
+        1 to add to the background array
+*/
+void add_processus(pid_t pid, int type);
+
+/*
+Remove a process from the foreground / background array of process
+
+Input:
+  pid: PID to remove from the array
+  type: 0 to remove from the background array
+        1 to remove from the background array
+*/
+void remove_processus(pid_t pid, int type);
+
+/*
+Handler for the SIGCHLD signal
+It waits for the child process and removes it from the foreground / background array
+
+Input:
+  sig: int
+*/
+void handler_child(int sig);
+
+/*
+Handler for the SIGINT signal
+It "deactivates" the SIGINT (Ctrl+C) signal. It is used to prevent the shell from being interrupted
+
+Input:
+  sig: int
+*/
+void handler_interrupt_shell(int sig);
+
+/*
+Return 1 if the process is in the background array
+
+Input:
+  pid: PID to check
 
 Output:
-  1 if the command is an internal command
+  1 if the process is in the background array
   0 if not
 */
-int is_internal(char *cmd);
+int is_background(pid_t pid);
 
 /*
-    Exec an internal command
+    Print an error message to stderr depending on the error code
 
     Input:
-      l: cmdline* (Current cmdline)
+      command: string (Command that caused the error)
 */
-void exec_internal(struct cmdline *l);
-
-/*
-    Exec an external command in a child process and wait for it to finish in the parent process
-
-    Input:
-      l: cmdline* (Current cmdline)
-*/
-void exec_external(struct cmdline *l);
+void error_handling(char *command);
 
 /*
     Redirect input if needed
@@ -59,6 +94,7 @@ int handle_input_redirection(struct cmdline *l, int *in);
 
     Input:
       l: cmdline* (Current cmdline)
+      in: int* (File descriptor for output redirection)
 
     Output:
       1 if the redirection was successful
@@ -67,10 +103,30 @@ int handle_input_redirection(struct cmdline *l, int *in);
 int handle_output_redirection(struct cmdline *l);
 
 /*
-    Print an error message to stderr depending on the error code
+Return 1 if the command is an internal one
+
+Input:
+  cmd: string (Command to analyze)
+
+Output:
+  1 if the command is an internal command
+  0 if not
+*/
+int is_internal(char *cmd);
+
+/*
+    Exec internal commands
 
     Input:
-      command: string (Command that caused the error)
+      l: cmdline* (Current cmdline)
 */
-void error_handling(char *command);
+void exec_internal(struct cmdline *l);
+
+/*
+    Exec external commands
+
+    Input:
+      l: cmdline* (Current cmdline)
+*/
+void exec_external(struct cmdline *l);
 #endif

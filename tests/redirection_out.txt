@@ -1,0 +1,8 @@
+#
+# redirection_out.txt - Tester la redirection de la sortie standard en mettant le résultat de ls dans un fichier
+#
+rm temp.txt
+ls > temp.txt
+cat temp.txt
+rm temp.txt
+CLOSE

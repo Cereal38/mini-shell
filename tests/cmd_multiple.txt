@@ -1,0 +1,7 @@
+#
+# cmd_multiple.txt - Exécuter une succession de commandes sans argument
+#
+ls
+echo
+ls
+CLOSE

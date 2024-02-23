@@ -1,0 +1,8 @@
+#
+# error_handling.txt - Tester la gestion des erreurs
+# Affiche un message d'erreur de commande inexistante, de fichier inexistant et de droits insuffisants
+#
+commande_inexistante
+cat fichier_inexistant
+cat /etc/shadow
+CLOSE

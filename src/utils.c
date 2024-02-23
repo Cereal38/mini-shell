@@ -1,7 +1,99 @@
 #include <string.h>
+#include <signal.h>
 #include "readcmd.h"
 #include "csapp.h"
 #include "utils.h"
+
+// Contain the PID of childs process (foreground and background)
+pid_t proc_foreground[MAX_SIZE_PROC_ARRAY] = {-1};
+pid_t proc_background[MAX_SIZE_PROC_ARRAY] = {-1};
+
+void add_processus(pid_t pid, int type)
+{
+  int i = 0;
+  if (type == FG)
+  {
+    // Find the position of the last element
+    while (proc_foreground[i] != -1)
+    {
+      i++;
+    }
+    // Add the new process to the array
+    proc_foreground[i] = pid;
+    proc_foreground[i + 1] = -1;
+  }
+  else
+  {
+    while (proc_background[i] != -1)
+    {
+      i++;
+    }
+    proc_background[i] = pid;
+    proc_background[i + 1] = -1;
+  }
+}
+
+void remove_processus(pid_t pid, int type)
+{
+  int i = 0;
+  if (type == FG)
+  {
+    // Find the position of the process
+    while (proc_foreground[i] != pid)
+    {
+      i++;
+    }
+    // Remove the process from the array and shift the other elements to the left
+    while (proc_foreground[i + 1] != -1)
+    {
+      proc_foreground[i] = proc_foreground[i + 1];
+      i++;
+    }
+    proc_foreground[i] = -1;
+  }
+  else
+  {
+    while (proc_background[i] != pid)
+    {
+      i++;
+    }
+    while (proc_background[i + 1] != -1)
+    {
+      proc_background[i] = proc_background[i + 1];
+      i++;
+    }
+    proc_background[i] = -1;
+  }
+}
+
+void handler_child(int sig)
+{
+  pid_t pid;
+  // Wait for the child process to finish
+  while ((pid = waitpid(-1, NULL, WNOHANG | WUNTRACED)) > 0)
+  {
+    remove_processus(pid, is_background(pid));
+  }
+}
+
+void handler_interrupt_shell(int sig)
+{
+  printf("\n");
+  return;
+}
+
+int is_background(pid_t pid)
+{
+  int i = 0;
+  while (proc_background[i] != -1)
+  {
+    if (proc_background[i] == pid)
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
 
 void error_handling(char *command)
 {
@@ -24,7 +116,8 @@ int handle_input_redirection(struct cmdline *l, int *in)
   int fd_in;
   if (l->in)
   {
-    fd_in = open(l->in, O_RDONLY);
+    // Open the file for reading
+    fd_in = Open(l->in, O_RDONLY, 0);
     if (fd_in == -1)
     {
       perror("open");
@@ -40,14 +133,15 @@ int handle_output_redirection(struct cmdline *l)
   int fd_out;
   if (l->out)
   {
-    fd_out = open(l->out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    // Open the file for writing
+    fd_out = open(l->out, O_WRONLY | O_CREAT, 0644);
     if (fd_out == -1)
     {
       perror("open");
       return 0;
     }
-    dup2(fd_out, STDOUT_FILENO); // Redirect standard output to the file
-    close(fd_out);               // Close the file descriptor
+    Dup2(fd_out, STDOUT); // Redirect standard output to the file
+    close(fd_out);        // Close the file descriptor
   }
   return 1;
 }
@@ -55,6 +149,10 @@ int handle_output_redirection(struct cmdline *l)
 int is_internal(char *cmd)
 {
   if (strcmp(cmd, "quit") == 0)
+  {
+    return 1;
+  }
+  else if (strcmp(cmd, "exit") == 0)
   {
     return 1;
   }
@@ -68,8 +166,7 @@ int is_internal(char *cmd)
 
 void exec_internal(struct cmdline *l)
 {
-
-  if (strcmp(l->seq[0][0], "quit") == 0)
+  if (strcmp(l->seq[0][0], "quit") == 0 || strcmp(l->seq[0][0], "exit") == 0)
   {
     exit(0);
   }
@@ -85,10 +182,15 @@ void exec_internal(struct cmdline *l)
 
 void exec_external(struct cmdline *l)
 {
-  int p[2];
-  int in = 0; // 'in' is the input file descriptor for the next command
+  int in = 0; // 'in' is the input file descriptor for the next command in the pipe (0 for the first command)
   pid_t pid;
 
+  Signal(SIGCHLD, handler_child); // Add the signal handler for SIGCHLD
+
+  if (l->is_background)
+  {
+    printf("Background process\n");
+  }
   // Redirect input if needed (wc < file.txt)
   if (!handle_input_redirection(l, &in))
   {
@@ -98,19 +200,21 @@ void exec_external(struct cmdline *l)
   // Iterate over each command in the pipeline
   for (int i = 0; l->seq[i] != NULL; i++)
   {
+    int p[2];
     pipe(p); // Create a new pipe
 
     if ((pid = fork()) == 0)
-    { // Child process
-      if (in != 0)
-      {                         // If 'in' is not standard input
-        dup2(in, STDIN_FILENO); // Redirect 'in' to standard input
-        close(in);              // Close the used file descriptor
+    {                          // Child process
+      Signal(SIGINT, SIG_DFL); // default sigint handler
+      if (in != 0)             // If 'in' is not standard input
+      {
+        Dup2(in, STDIN); // Redirect 'in' to standard input
+        close(in);       // Close the used file descriptor
       }
 
       if (l->seq[i + 1] != NULL)
-      {                            // If there is a next command
-        dup2(p[1], STDOUT_FILENO); // Redirect standard output to 'p[1]'
+      {                     // If there is a next command
+        Dup2(p[1], STDOUT); // Redirect standard output to 'p[1]'
       }
 
       // Redirect output if needed (ls > file.txt)
@@ -129,9 +233,8 @@ void exec_external(struct cmdline *l)
       exit(EXIT_FAILURE);
     }
     else
-    {             // Parent process
-      wait(NULL); // Wait for the child process to finish
-
+    { // Parent process
+      add_processus(pid, l->is_background);
       if (in != 0)
       {            // If 'in' is not standard input
         close(in); // Close the used file descriptor
@@ -140,5 +243,11 @@ void exec_external(struct cmdline *l)
       close(p[1]); // Close the unused write end of the pipe
       in = p[0];   // Save the read end of the pipe as 'in' for the next command
     }
+  }
+  while (proc_foreground[0] != -1)
+  {
+    sleep(1);
+    // if(proc_foreground[0] != -1)
+    // printf("Waiting for process to finish %d\n",proc_foreground[0]);
   }
 }
